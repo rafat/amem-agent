@@ -1,0 +1,208 @@
+.
+├── assets
+│   ├── brand-assets
+│   │   ├── logo
+│   │   │   ├── logo-black.png
+│   │   │   ├── logo-black.svg
+│   │   │   ├── logo-lime.png
+│   │   │   ├── logo-lime.svg
+│   │   │   ├── logo-white.png
+│   │   │   └── logo-white.svg
+│   │   ├── submark
+│   │   │   ├── submark-black.png
+│   │   │   ├── submark-black.svg
+│   │   │   ├── submark-lime.png
+│   │   │   ├── submark-lime.svg
+│   │   │   ├── submark-white.png
+│   │   │   └── submark-white.svg
+│   │   └── wordmark
+│   │       ├── wordmark-black.png
+│   │       ├── wordmark-black.svg
+│   │       ├── wordmark-lime.png
+│   │       ├── wordmark-lime.svg
+│   │       ├── wordmark-white.png
+│   │       └── wordmark-white.svg
+│   └── CAMBRIAN_DESIGN_4-52 (2).jpg
+├── CreateTool.md
+├── examples
+│   ├── carbon-examples.md
+│   └── citrex-examples.md
+├── LICENSE
+├── package-lock.json
+├── package.json
+├── pnpm-lock.yaml
+├── project-structure.txt
+├── README.md
+├── src
+│   ├── agent
+│   │   ├── index.ts
+│   │   └── modelProvider.ts
+│   ├── constants
+│   │   └── index.ts
+│   ├── index.ts
+│   ├── langchain
+│   │   ├── carbon
+│   │   │   ├── createDisposableStrategy.ts
+│   │   │   ├── createOverlappingStrategy.ts
+│   │   │   ├── createRecurringStrategy.ts
+│   │   │   ├── deleteStrategy.ts
+│   │   │   ├── getUserStrategies.ts
+│   │   │   └── index.ts
+│   │   ├── citrex
+│   │   │   ├── calculateMarginRequirement.ts
+│   │   │   ├── cancelAndReplaceOrder.ts
+│   │   │   ├── cancelOpenOrdersForProduct.ts
+│   │   │   ├── cancelOrder.ts
+│   │   │   ├── cancelOrders.ts
+│   │   │   ├── deposit.ts
+│   │   │   ├── getAccountHealth.ts
+│   │   │   ├── getKlines.ts
+│   │   │   ├── getOrderBook.ts
+│   │   │   ├── getProduct.ts
+│   │   │   ├── getProducts.ts
+│   │   │   ├── getServerTime.ts
+│   │   │   ├── getTickers.ts
+│   │   │   ├── getTradeHistory.ts
+│   │   │   ├── index.ts
+│   │   │   ├── listBalances.ts
+│   │   │   ├── listOpenOrders.ts
+│   │   │   ├── listPositions.ts
+│   │   │   ├── placeOrder.ts
+│   │   │   ├── placeOrders.ts
+│   │   │   └── withdraw.ts
+│   │   ├── dexscreener
+│   │   │   ├── getTokenAddress.ts
+│   │   │   └── index.ts
+│   │   ├── index.ts
+│   │   ├── sei-erc20
+│   │   │   ├── balance.ts
+│   │   │   ├── index.ts
+│   │   │   └── transfer.ts
+│   │   ├── sei-erc721
+│   │   │   ├── balance.ts
+│   │   │   ├── index.ts
+│   │   │   ├── mint.ts
+│   │   │   └── transfer.ts
+│   │   ├── silo
+│   │   │   ├── index.ts
+│   │   │   ├── stake.ts
+│   │   │   └── unstake.ts
+│   │   ├── symphony
+│   │   │   ├── index.ts
+│   │   │   └── swap.ts
+│   │   ├── takara
+│   │   │   ├── borrow.ts
+│   │   │   ├── index.ts
+│   │   │   ├── mint.ts
+│   │   │   ├── query.ts
+│   │   │   ├── redeem.ts
+│   │   │   └── repay.ts
+│   │   └── twitter
+│   │       ├── getAccountDetails.ts
+│   │       ├── getAccountMentions.ts
+│   │       ├── index.ts
+│   │       ├── post.ts
+│   │       └── postTweetReply.ts
+│   ├── tools
+│   │   ├── carbon
+│   │   │   ├── composeTradeBySourceTx.ts
+│   │   │   ├── composeTradeByTargetTx.ts
+│   │   │   ├── createBuySellStrategy.ts
+│   │   │   ├── createOverlappingStrategy.ts
+│   │   │   ├── deleteStrategy.ts
+│   │   │   ├── getUserStrategies.ts
+│   │   │   ├── index.ts
+│   │   │   ├── updateStrategy.ts
+│   │   │   └── utils.ts
+│   │   ├── citrex
+│   │   │   ├── calculateMarginRequirement.ts
+│   │   │   ├── cancelAndReplaceOrder.ts
+│   │   │   ├── cancelOpenOrdersForProduct.ts
+│   │   │   ├── cancelOrder.ts
+│   │   │   ├── cancelOrders.ts
+│   │   │   ├── customLoader.js
+│   │   │   ├── deposit.ts
+│   │   │   ├── getAccountHealth.ts
+│   │   │   ├── getKlines.ts
+│   │   │   ├── getOrderBook.ts
+│   │   │   ├── getProduct.ts
+│   │   │   ├── getProducts.ts
+│   │   │   ├── getServerTime.ts
+│   │   │   ├── getTickers.ts
+│   │   │   ├── getTradeHistory.ts
+│   │   │   ├── index.ts
+│   │   │   ├── listBalances.ts
+│   │   │   ├── listOpenOrders.ts
+│   │   │   ├── listPositions.ts
+│   │   │   ├── placeOrder.ts
+│   │   │   ├── placeOrders.ts
+│   │   │   └── withdraw.ts
+│   │   ├── dexscreener
+│   │   │   ├── getTokenAddress.ts
+│   │   │   └── index.ts
+│   │   ├── index.ts
+│   │   ├── sei-erc20
+│   │   │   ├── balance.ts
+│   │   │   ├── index.ts
+│   │   │   └── transfer.ts
+│   │   ├── sei-erc721
+│   │   │   ├── balance.ts
+│   │   │   ├── index.ts
+│   │   │   ├── mint.ts
+│   │   │   └── transfer.ts
+│   │   ├── silo
+│   │   │   ├── index.ts
+│   │   │   ├── stakeBond.ts
+│   │   │   └── unstakeBond.ts
+│   │   ├── symphony
+│   │   │   ├── index.ts
+│   │   │   └── swap.ts
+│   │   ├── takara
+│   │   │   ├── abi
+│   │   │   │   ├── borrow
+│   │   │   │   │   ├── controllerabi.ts
+│   │   │   │   │   ├── erc20abi.ts
+│   │   │   │   │   └── t_Tokenabi.ts
+│   │   │   │   ├── mint
+│   │   │   │   │   ├── erc20abi.ts
+│   │   │   │   │   └── t_Tokenabi.ts
+│   │   │   │   ├── query
+│   │   │   │   │   └── t_Tokenabi.ts
+│   │   │   │   ├── redeem
+│   │   │   │   │   ├── erc20abi.ts
+│   │   │   │   │   └── t_Tokenabi.ts
+│   │   │   │   └── repay
+│   │   │   │       ├── erc20abi.ts
+│   │   │   │       └── t_Tokenabi.ts
+│   │   │   ├── borrow.ts
+│   │   │   ├── index.ts
+│   │   │   ├── mint.ts
+│   │   │   ├── query.ts
+│   │   │   ├── redeem.ts
+│   │   │   ├── repay.ts
+│   │   │   └── tokenMap.ts
+│   │   └── twitter
+│   │       ├── getAccountDetails.ts
+│   │       ├── getAccountMentions.ts
+│   │       ├── index.ts
+│   │       ├── post.ts
+│   │       ├── postTweetReply.ts
+│   │       ├── schemas.ts
+│   │       └── types.ts
+│   ├── types
+│   │   └── index.ts
+│   └── utils
+│       ├── approveTokens.ts
+│       ├── chain.ts
+│       ├── formatSei.ts
+│       ├── getBalance.ts
+│       ├── getTokenDecimals.ts
+│       ├── index.ts
+│       ├── isContract.ts
+│       ├── tokens.ts
+│       └── useSeiBridge.ts
+├── test
+│   └── index.ts
+└── tsconfig.json
+
+39 directories, 167 files
