@@ -1,20 +1,13 @@
 export * from './sei-erc20';
 export * from './sei-erc721';
-export * from './symphony';
 export * from './dexscreener';
-export * from './silo';
-export * from './takara';
 export * from './twitter';
-export * from './citrex';
+export * from './testnet-amm';
+export * from './testnet-lending';
+export * from './testnet-staking';
+export * from './testnet-portfolio';
 
 import type { SeiAgentKit } from "../agent";
-import {
-  CarbonCreateDisposableStrategyTool,
-  CarbonCreateRecurringStrategyTool,
-  CarbonCreateOverlappingStrategyTool,
-  CarbonDeleteStrategyTool,
-  CarbonGetUserStrategiesTool,
-} from "./carbon";
 import {
   SeiERC20BalanceTool,
   SeiERC20TransferTool,
@@ -22,86 +15,70 @@ import {
   SeiERC721TransferTool,
   SeiERC721MintTool,
   SeiGetTokenAddressTool,
-  SeiStakeTool,
-  SeiUnstakeTool,
-  SeiSwapTool,
-  SeiMintTakaraTool,
-  SeiBorrowTakaraTool,
-  SeiRepayTakaraTool,
-  SeiRedeemTakaraTool,
-  SeiGetRedeemableAmountTool,
-  SeiGetBorrowBalanceTool,
-  SeiCitrexDepositTool,
-  SeiCitrexWithdrawTool,
-  SeiCitrexGetProductsTool,
-  SeiCitrexGetOrderBookTool,
-  SeiCitrexGetAccountHealthTool,
-  SeiCitrexGetTickersTool,
-  SeiCitrexCalculateMarginRequirementTool,
-  SeiCitrexGetKlinesTool,
-  SeiCitrexGetProductTool,
-  SeiCitrexGetServerTimeTool,
-  SeiCitrexGetTradeHistoryTool,
-  SeiCitrexCancelAndReplaceOrderTool,
-  SeiCitrexCancelOpenOrdersForProductTool,
-  SeiCitrexCancelOrderTool,
-  SeiCitrexCancelOrdersTool,
-  SeiCitrexListBalancesTool,
-  SeiCitrexListOpenOrdersTool,
-  SeiCitrexListPositionsTool,
-  SeiCitrexPlaceOrderTool,
-  SeiCitrexPlaceOrdersTool,
   SeiPostTweetTool,
   SeiGetAccountDetailsTool,
   SeiGetAccountMentionsTool,
   SeiPostTweetReplyTool,
 } from './index';
 
+// Testnet AMM Tools
+import {
+  TestnetAMMSwapTool,
+  TestnetAMMAddLiquidityTool,
+  TestnetAMMRemoveLiquidityTool,
+} from './testnet-amm';
+
+// Testnet Lending Tools
+import {
+  TestnetLendingDepositCollateralTool,
+  TestnetLendingBorrowTool,
+  TestnetLendingRepayTool,
+  TestnetLendingWithdrawCollateralTool,
+} from './testnet-lending';
+
+// Testnet Staking Tools
+import {
+  TestnetStakingStakeTool,
+  TestnetStakingUnstakeTool,
+  TestnetStakingClaimRewardsTool,
+} from './testnet-staking';
+
+// Testnet Portfolio Tools
+import {
+  TestnetPortfolioGetTool,
+} from './testnet-portfolio';
+
 export function createSeiTools(seiKit: SeiAgentKit) {
   return [
+    // Core Tools
     new SeiERC20BalanceTool(seiKit),
     new SeiERC20TransferTool(seiKit),
     new SeiERC721BalanceTool(seiKit),
     new SeiERC721TransferTool(seiKit),
     new SeiERC721MintTool(seiKit),
     new SeiGetTokenAddressTool(seiKit),
-    new SeiStakeTool(seiKit),
-    new SeiUnstakeTool(seiKit),
-    new SeiSwapTool(seiKit),
-    new SeiMintTakaraTool(seiKit),
-    new SeiBorrowTakaraTool(seiKit),
-    new SeiRepayTakaraTool(seiKit),
-    new SeiRedeemTakaraTool(seiKit),
-    new SeiGetRedeemableAmountTool(seiKit),
-    new SeiGetBorrowBalanceTool(seiKit),
-    new CarbonCreateDisposableStrategyTool(seiKit),
-    new CarbonCreateRecurringStrategyTool(seiKit),
-    new CarbonCreateOverlappingStrategyTool(seiKit),
-    new CarbonDeleteStrategyTool(seiKit),
-    new CarbonGetUserStrategiesTool(seiKit),
     new SeiPostTweetTool(seiKit),
     new SeiGetAccountDetailsTool(seiKit),
     new SeiGetAccountMentionsTool(seiKit),
     new SeiPostTweetReplyTool(seiKit),
-    new SeiCitrexDepositTool(seiKit),
-    new SeiCitrexWithdrawTool(seiKit),
-    new SeiCitrexGetProductsTool(seiKit),
-    new SeiCitrexGetOrderBookTool(seiKit),
-    new SeiCitrexGetAccountHealthTool(seiKit),
-    new SeiCitrexGetTickersTool(seiKit),
-    new SeiCitrexCalculateMarginRequirementTool(seiKit),
-    new SeiCitrexGetKlinesTool(seiKit),
-    new SeiCitrexGetProductTool(seiKit),
-    new SeiCitrexGetServerTimeTool(seiKit),
-    new SeiCitrexGetTradeHistoryTool(seiKit),
-    new SeiCitrexCancelAndReplaceOrderTool(seiKit),
-    new SeiCitrexCancelOpenOrdersForProductTool(seiKit),
-    new SeiCitrexCancelOrderTool(seiKit),
-    new SeiCitrexCancelOrdersTool(seiKit),
-    new SeiCitrexListBalancesTool(seiKit),
-    new SeiCitrexListOpenOrdersTool(seiKit),
-    new SeiCitrexListPositionsTool(seiKit),
-    new SeiCitrexPlaceOrderTool(seiKit),
-    new SeiCitrexPlaceOrdersTool(seiKit),
+    
+    // Testnet AMM Tools
+    new TestnetAMMSwapTool(seiKit),
+    new TestnetAMMAddLiquidityTool(seiKit),
+    new TestnetAMMRemoveLiquidityTool(seiKit),
+    
+    // Testnet Lending Tools
+    new TestnetLendingDepositCollateralTool(seiKit),
+    new TestnetLendingBorrowTool(seiKit),
+    new TestnetLendingRepayTool(seiKit),
+    new TestnetLendingWithdrawCollateralTool(seiKit),
+    
+    // Testnet Staking Tools
+    new TestnetStakingStakeTool(seiKit),
+    new TestnetStakingUnstakeTool(seiKit),
+    new TestnetStakingClaimRewardsTool(seiKit),
+    
+    // Testnet Portfolio Tools
+    new TestnetPortfolioGetTool(seiKit),
   ];
 }

@@ -1,6 +1,5 @@
 import { SeiAgentKit } from "./src/agent";
 import { MemoryManager } from "./src/memory/manager";
-import { SeiSwapToolWithMemory } from "./src/memory/wrapped-tools/symphony";
 import { HumanMessage } from "@langchain/core/messages";
 import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
@@ -51,7 +50,7 @@ async function setupAgentWithRAG() {
     
     // Create tools with memory support
     const agentTools = [
-      new SeiSwapToolWithMemory(agentInstance, memoryManager, "test_user_123"),
+      // Testnet tools can be added here if needed
       // TODO: Add other wrapped tools here
     ];
 

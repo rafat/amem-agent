@@ -9,15 +9,6 @@ export type ChainConfig = {
 };
 
 const chainIdConfigMap: Record<string, ChainConfig> = {
-  'silo-test': {
-    rpcUrl: 'https://silo-test.seinetwork.io/',
-    evmRpcUrl: '',
-    restUrl: 'http://3.137.205.53:1317/',
-    contractAddress:
-      'sei14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sh9m79m',
-    explorerUrl: '',
-    evmEnabled: true,
-  },
   'atlantic-2': {
     rpcUrl: 'https://rpc.atlantic-2.seinetwork.io/',
     evmRpcUrl: '',
