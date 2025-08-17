@@ -47,6 +47,11 @@ The Cambrian Agent Kit integrates with a variety of protocols and services:
 
 ## 🔧 Quickstart
 
+#### Prerequisites
+
+- Docker and Docker Compose installed and running
+- Node.js 18+ (for local development)
+
 #### Configuration
 
 Create a `.env` file with your API keys and configurations:
@@ -73,6 +78,51 @@ npm install
 ```bash
 npm run test
 ```
+
+## 🐳 Docker Setup (Recommended)
+
+For an easier setup with all databases pre-configured, you can use Docker:
+
+#### Quick Start with Docker
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd amem-agent
+```
+
+2. Create a `.env` file with your configuration:
+```bash
+cp .env.example .env
+# Edit .env with your values
+```
+
+3. Build and start all services:
+```bash
+npm run setup
+```
+
+4. View logs:
+```bash
+npm run docker:logs
+```
+
+5. Run the agent:
+```bash
+docker-compose exec agent-kit npm run test
+```
+
+That's it! All databases and services are now running in Docker containers.
+
+#### Docker Management Commands
+
+- `npm run docker:build` - Build all services
+- `npm run docker:start` - Start all services in background
+- `npm run docker:stop` - Stop all services
+- `npm run docker:reset` - Reset all services and data
+- `npm run docker:logs` - View logs from all services
+- `npm run docker:backup` - Create backups of all databases
+- `npm run docker:health` - Run health checks on all services
 
 ## 🔗 Links
 

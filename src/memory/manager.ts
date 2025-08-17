@@ -1,11 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Memory, MemoryType } from './models';
 
-// Use mock implementations for now
-// TODO: Switch to real implementations when Docker is available
-import { getChromaClient, getNeo4jDriver } from './mock-db';
-// import { getChromaClient } from './chroma';
-// import { getNeo4jDriver } from './neo4j';
+// Use real implementations
+import { getChromaClient } from './chroma';
+import { getNeo4jDriver } from './neo4j';
 
 export class MemoryManager {
   private chroma: any;
@@ -50,16 +48,13 @@ export class MemoryManager {
     };
 
     try {
-      // TODO: Generate embedding for the memory content
-      // const embedding = await this.generateEmbedding(newMemory.content);
+      // Generate embedding for the memory content
+      const embedding = await this.generateEmbedding(newMemory.content);
 
       // Store in ChromaDB for semantic search
-      // For now, we'll use a placeholder embedding
-      const placeholderEmbedding = Array(128).fill(0).map(() => Math.random());
-      
       await this.collection.add({
         ids: [newMemory.id],
-        embeddings: [placeholderEmbedding],
+        embeddings: [embedding],
         metadatas: [{ 
           type: newMemory.type, 
           importance: newMemory.importance,
@@ -87,14 +82,11 @@ export class MemoryManager {
    */
   async retrieveMemories(queryText: string, k: number = 5): Promise<Memory[]> {
     try {
-      // TODO: Generate embedding for the query text
-      // const queryEmbedding = await this.generateEmbedding(queryText);
-      
-      // For now, we'll use a placeholder embedding
-      const placeholderEmbedding = Array(128).fill(0).map(() => Math.random());
+      // Generate embedding for the query text
+      const queryEmbedding = await this.generateEmbedding(queryText);
 
       const results = await this.collection.query({
-        queryEmbeddings: [placeholderEmbedding],
+        queryEmbeddings: [queryEmbedding],
         nResults: k,
       });
 
@@ -158,15 +150,34 @@ export class MemoryManager {
   }
 
   /**
-   * Generate an embedding for a text string
-   * TODO: Implement actual embedding generation
+   * Generate an embedding for a text string using OpenAI
    * @param text The text to embed
    * @returns The embedding vector
    */
   private async generateEmbedding(text: string): Promise<number[]> {
-    // This is a placeholder implementation
-    // In a real implementation, you would use an embedding model like OpenAI's text-embedding-ada-002
-    // or a local model like SentenceTransformers
-    return Array(128).fill(0).map(() => Math.random());
+    try {
+      // Import OpenAIEmbeddings from LangChain
+      const { OpenAIEmbeddings } = await import('@langchain/openai');
+      
+      // Check if API key is available
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) {
+        throw new Error('OPENAI_API_KEY environment variable is not set');
+      }
+      
+      // Initialize OpenAI embeddings client
+      const embeddings = new OpenAIEmbeddings({
+        apiKey: apiKey,
+        model: 'text-embedding-ada-002',
+      });
+      
+      // Generate embedding
+      const embedding = await embeddings.embedQuery(text);
+      
+      return embedding;
+    } catch (error) {
+      console.error('Failed to generate embedding:', error);
+      throw error;
+    }
   }
 }

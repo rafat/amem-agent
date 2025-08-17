@@ -12,11 +12,25 @@
     }
   },
   "scripts": {
+    "build": "tsc",
     "test": "tsx test/index.ts",
     "citrex": "tsx test/citrex-test.ts",
     "test-memory": "tsx test-memory.ts",
     "test-memory-agent": "tsx test-memory-agent.ts",
-    "test-rag-agent": "tsx test-rag-agent.ts"
+    "test-rag-agent": "tsx test-rag-agent.ts",
+    "test-memory-db": "tsx test-memory-db.ts",
+    "test-chromadb": "tsx test-chromadb.ts",
+    "test-chromadb-v1": "tsx test-chromadb-v1.ts",
+    "test-chromadb-v2": "tsx test-chromadb-v2.ts",
+    "test-chromadb-v2-basic": "tsx test-chromadb-v2-basic.ts",
+    "docker:build": "docker-compose build",
+    "docker:start": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "docker:reset": "docker-compose down -v && docker-compose up -d",
+    "docker:logs": "docker-compose logs -f",
+    "docker:backup": "bash scripts/backup.sh",
+    "docker:health": "bash scripts/healthcheck.sh",
+    "setup": "docker-compose up -d && echo 'Waiting for services to start...' && sleep 10 && echo 'Initialization complete. Run \"npm run test\" to start the agent.'"
   },
   "keywords": [
     "sei",
