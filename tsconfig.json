@@ -27,12 +27,13 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "moduleResolution": "Node",
-    "types": []
+    "moduleResolution": "node",
+    "types": [],
+    "allowImportingTsExtensions": true,
+    "noEmit": false
   },
   "include": [
-    "src/**/*",
-    "test/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

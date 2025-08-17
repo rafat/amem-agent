@@ -2,11 +2,13 @@ import { MemoryManager } from './src/memory/manager';
 import { MemoryType } from './src/memory/models';
 
 async function testMemorySystem() {
+  let memoryManager: MemoryManager | null = null;
+  
   console.log('Testing Memory System with Real Databases...');
   
   try {
     // Create memory manager
-    const memoryManager = await MemoryManager.create();
+    memoryManager = await MemoryManager.create();
     console.log('✓ Memory Manager initialized successfully');
     
     // Add a test memory
@@ -32,6 +34,13 @@ async function testMemorySystem() {
     console.log('Memory System test completed successfully!');
   } catch (error) {
     console.error('Memory System test failed:', error);
+  } finally {
+    // Close database connections
+    if (memoryManager) {
+      await memoryManager.close();
+      console.log('✓ Database connections closed');
+    }
+    process.exit(0);
   }
 }
 

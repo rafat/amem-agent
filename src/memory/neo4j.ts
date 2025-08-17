@@ -1,5 +1,5 @@
 import neo4j, { Driver, Config } from 'neo4j-driver';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 

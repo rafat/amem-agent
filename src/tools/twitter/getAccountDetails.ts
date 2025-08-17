@@ -1,6 +1,6 @@
 import { TwitterApi, TwitterApiTokens } from "twitter-api-v2";
 import { TwitterConfig } from "./types";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 import { z } from "zod";
 
 dotenv.config();

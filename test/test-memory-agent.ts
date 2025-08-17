@@ -1,5 +1,12 @@
 import { SeiAgentKit } from "../src/agent";
 import { MemoryManager } from "../src/memory/manager";
+import { 
+  MemoryAwareTestnetAMMSwapTool,
+  MemoryAwareTestnetAMMAddLiquidityTool,
+  MemoryAwareTestnetAMMRemoveLiquidityTool,
+  MemoryAwareTestnetLendingDepositCollateralTool,
+  MemoryAwareTestnetLendingBorrowTool
+} from "../src/memory/wrapped-tools";
 import { HumanMessage } from "@langchain/core/messages";
 import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
@@ -48,7 +55,11 @@ async function setupAgentWithMemory() {
     
     // Create tools with memory support
     const agentTools = [
-      new SeiSwapToolWithMemory(agentInstance, memoryManager, "test_user_123"),
+      new MemoryAwareTestnetAMMSwapTool(agentInstance, memoryManager, "test_user_123"),
+      new MemoryAwareTestnetAMMAddLiquidityTool(agentInstance, memoryManager, "test_user_123"),
+      new MemoryAwareTestnetAMMRemoveLiquidityTool(agentInstance, memoryManager, "test_user_123"),
+      new MemoryAwareTestnetLendingDepositCollateralTool(agentInstance, memoryManager, "test_user_123"),
+      new MemoryAwareTestnetLendingBorrowTool(agentInstance, memoryManager, "test_user_123"),
       // TODO: Add other wrapped tools here
     ];
 

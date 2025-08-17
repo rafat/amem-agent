@@ -1,14 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Memory, MemoryType } from './models';
-
-// Use real implementations
 import { getChromaClient } from './chroma';
-import { getNeo4jDriver } from './neo4j';
+import { getNeo4jDriver, closeNeo4jDriver } from './neo4j';
+import { ChromaClient, CloudClient, Collection } from 'chromadb';
 
 export class MemoryManager {
-  private chroma: any;
+  private chroma: ChromaClient | CloudClient;
   private neo4j: any;
-  private collection: any;
+  private collection: Collection;
 
   private constructor() {
     this.chroma = getChromaClient();
@@ -98,9 +97,9 @@ export class MemoryManager {
           memories.push({
             id: results.ids[0][i],
             content: results.documents[0][i],
-            type: results.metadatas[0][i].type,
-            timestamp: new Date(results.metadatas[0][i].timestamp),
-            importance: results.metadatas[0][i].importance,
+            type: results.metadatas[0][i].type as MemoryType,
+            timestamp: new Date(results.metadatas[0][i].timestamp as string),
+            importance: results.metadatas[0][i].importance as number,
             metadata: results.metadatas[0][i],
           });
         }
@@ -122,26 +121,44 @@ export class MemoryManager {
     try {
       // Example: If memory is a transaction, link user, protocol, and tokens
       if (memory.type === 'transaction_record') {
-        const { userId, protocol, fromToken, toToken, hash } = memory.metadata;
+        const { userId, protocol, fromToken, toToken, hash, toolName } = memory.metadata;
         // Use MERGE to avoid duplicates
         await session.run(`
           MERGE (u:User {id: $userId})
           MERGE (p:Protocol {name: $protocol})
           MERGE (t_from:Token {symbol: $fromToken})
           MERGE (t_to:Token {symbol: $toToken})
-          CREATE (tx:Transaction {hash: $hash, content: $content, timestamp: $timestamp})
+          CREATE (tx:Transaction {hash: $hash, content: $content, timestamp: $timestamp, toolName: $toolName})
           MERGE (u)-[:EXECUTED]->(tx)
           MERGE (tx)-[:ON_PROTOCOL]->(p)
           MERGE (tx)-[:SWAPPED_FROM]->(t_from)
           MERGE (tx)-[:SWAPPED_TO]->(t_to)
         `, { 
           userId, 
-          protocol, 
-          fromToken, 
-          toToken, 
-          hash,
+          protocol: protocol || 'Unknown', 
+          fromToken: fromToken || 'Unknown', 
+          toToken: toToken || 'Unknown', 
+          hash: hash || 'Unknown',
+          toolName: toolName || 'Unknown',
           content: memory.content, 
           timestamp: memory.timestamp.toISOString() 
+        });
+      }
+      // Handle reflection/error memories
+      else if (memory.type === 'reflection') {
+        const { userId, toolName, action } = memory.metadata;
+        await session.run(`
+          MERGE (u:User {id: $userId})
+          MERGE (t:Tool {name: $toolName})
+          CREATE (r:Reflection {content: $content, timestamp: $timestamp, action: $action})
+          MERGE (u)-[:EXPERIENCED]->(r)
+          MERGE (r)-[:RELATED_TO]->(t)
+        `, {
+          userId,
+          toolName: toolName || 'Unknown',
+          action: action || 'Unknown',
+          content: memory.content,
+          timestamp: memory.timestamp.toISOString()
         });
       }
       // Add more logic for other memory types
@@ -180,5 +197,12 @@ export class MemoryManager {
       console.error('Failed to generate embedding:', error);
       throw error;
     }
+  }
+
+  /**
+   * Close database connections
+   */
+  async close(): Promise<void> {
+    await closeNeo4jDriver();
   }
 }
