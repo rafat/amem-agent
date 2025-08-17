@@ -23,6 +23,7 @@ export class MemoryManager {
 
   private async initializeCollection() {
     try {
+      // For Chroma Cloud, we need to get or create the collection differently
       this.collection = await this.chroma.getOrCreateCollection({ name: 'agent_memories' });
     } catch (error) {
       console.error('Failed to initialize ChromaDB collection:', error);
