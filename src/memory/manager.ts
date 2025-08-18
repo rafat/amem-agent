@@ -86,42 +86,85 @@ export class MemoryManager {
    * @returns Array of matching memories
    */
   async retrieveMemories(queryText: string, k: number = 5): Promise<Memory[]> {
+    const memoriesWithScores = await this.retrieveMemoriesWithScores(queryText, k);
+    return memoriesWithScores.map(item => item.memory);
+  }
+
+  /**
+   * Calculate temporal weight for a memory based on its age
+   * @param timestamp The timestamp of the memory
+   * @param halfLife The half-life in days (default: 7 days)
+   * @returns Temporal weight between 0 and 1
+   */
+  calculateTemporalWeight(timestamp: Date, halfLife: number = 7): number {
+    const now = new Date();
+    const ageInDays = (now.getTime() - timestamp.getTime()) / (1000 * 60 * 60 * 24);
+    
+    // Exponential decay function
+    return Math.pow(0.5, ageInDays / halfLife);
+  }
+
+  /**
+   * Retrieve memories based on a query with enhanced scoring
+   * @param queryText The text to search for
+   * @param k The number of memories to retrieve
+   * @param memoryType Optional filter by memory type
+   * @param userId Optional filter by user ID
+   * @returns Array of matching memories with scores
+   */
+  async retrieveMemoriesWithScores(
+    queryText: string, 
+    k: number = 5,
+    memoryType?: MemoryType,
+    userId?: string
+  ): Promise<Array<{memory: Memory, score: number}>> {
     try {
       // Generate embedding for the query text
       const queryEmbedding = await this.generateEmbedding(queryText);
 
       const results = await this.collection.query({
         queryEmbeddings: [queryEmbedding],
-        nResults: k,
+        nResults: k * 2, // Get more results to score and filter
       });
 
-      // Format results back into Memory objects
-      const memories: Memory[] = [];
+      // Format results back into Memory objects with initial scores
+      const memoriesWithScores: Array<{memory: Memory, score: number}> = [];
       if (results && results.ids && results.ids.length > 0) {
         for (let i = 0; i < results.ids[0].length; i++) {
           // Check if content and metadata are not null
-          const content = results.documents?.[0]?.[i] ?? "";
+          const content = results.documents?.[0]?.[i] ?? '';
           const metadata = results.metadatas?.[0]?.[i] ?? {};
-
-          memories.push({
+          
+          // Apply filters if specified
+          if (memoryType && metadata.type !== memoryType) continue;
+          if (userId && metadata.userId !== userId) continue;
+          
+          const memory: Memory = {
             id: results.ids[0][i],
             content: content,
-            type: (metadata.type as MemoryType) ?? "user_preference",
-            timestamp: metadata.timestamp
-              ? new Date(metadata.timestamp as string)
-              : new Date(),
-            importance:
-              typeof metadata.importance === "number"
-                ? metadata.importance
-                : 0.5,
+            type: metadata.type as MemoryType ?? 'user_preference',
+            timestamp: metadata.timestamp ? new Date(metadata.timestamp as string) : new Date(),
+            importance: typeof metadata.importance === 'number' ? metadata.importance : 0.5,
             metadata: metadata,
+          };
+          
+          // Calculate base score combining importance and temporal weighting
+          const temporalWeight = this.calculateTemporalWeight(memory.timestamp);
+          let score = memory.importance * temporalWeight;
+          
+          memoriesWithScores.push({
+            memory,
+            score
           });
         }
       }
 
-      return memories;
+      // Sort by score and return top k
+      return memoriesWithScores
+        .sort((a, b) => b.score - a.score)
+        .slice(0, k);
     } catch (error) {
-      console.error("Failed to retrieve memories:", error);
+      console.error('Failed to retrieve memories with scores:', error);
       throw error;
     }
   }

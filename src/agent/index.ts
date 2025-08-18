@@ -30,22 +30,31 @@ import {
 import { getTokenForProvider } from './modelProvider';
 import { ModelProviderName } from '../types';
 import { z } from 'zod';
+import { MemoryManager } from '../memory/manager';
+import { Memory } from '../memory/models';
 
 export class SeiAgentKit {
   public publicClient: ViemPublicClient;
   public walletClient: ViemWalletClient;
   public wallet_address: Address;
   public token: string | undefined;
+  public memoryManager: MemoryManager | null = null;
+  
   /**
    * Creates a new SeiAgentKit instance
    * @param private_key The private key for the wallet
    * @param provider The model provider to use
+   * @param memoryManager Optional memory manager for enhanced decision making
    */
   constructor(
     private_key: string,
     provider: any,
+    memoryManager?: MemoryManager,
   ) {
-    const account = privateKeyToAccount(private_key as Address);
+    // Ensure private key has 0x prefix
+    const formattedPrivateKey = private_key.startsWith('0x') ? private_key : `0x${private_key}`;
+    
+    const account = privateKeyToAccount(formattedPrivateKey as `0x${string}`);
     this.publicClient = createPublicClient({
       chain: sei,
       transport: http()
@@ -58,15 +67,149 @@ export class SeiAgentKit {
     });
 
     this.token = getTokenForProvider(provider);
+    
+    // Set memory manager if provided
+    if (memoryManager) {
+      this.memoryManager = memoryManager;
+    }
   }
 
   /**
-   * Gets the ERC20 token balance
-   * @param contract_address Optional ERC-20 token contract address. If not provided, gets native SEI balance
-   * @returns Promise with formatted balance as string
+   * Retrieves relevant memories for a given context
+   * @param context The context to search for relevant memories
+   * @param k The number of memories to retrieve
+   * @returns Array of relevant memories
    */
-  async getERC20Balance(contract_address?: Address): Promise<string> {
-    return get_erc20_balance(this, contract_address);
+  async getRelevantMemories(context: string, k: number = 5): Promise<Memory[]> {
+    if (!this.memoryManager) {
+      return [];
+    }
+    
+    try {
+      return await this.memoryManager.retrieveMemories(context, k);
+    } catch (error) {
+      console.error("Failed to retrieve relevant memories:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Calculates relevance score between a query and a memory
+   * @param query The query text
+   * @param memory The memory to score
+   * @returns Relevance score between 0 and 1
+   */
+  async calculateRelevanceScore(query: string, memory: Memory): Promise<number> {
+    // For now, we'll use a simple approach based on semantic similarity
+    // In a more advanced implementation, we could use embeddings to calculate cosine similarity
+    
+    // Base score from memory importance
+    let score = memory.importance;
+    
+    // Temporal weighting - more recent memories are more relevant
+    const now = new Date();
+    const memoryAge = (now.getTime() - memory.timestamp.getTime()) / (1000 * 60 * 60 * 24); // Age in days
+    
+    // Apply time decay (exponential decay with half-life of 7 days)
+    const timeWeight = Math.pow(0.5, memoryAge / 7);
+    score *= timeWeight;
+    
+    // Content similarity boost (simple keyword matching for now)
+    const queryWords = query.toLowerCase().split(/\s+/);
+    const contentWords = memory.content.toLowerCase().split(/\s+/);
+    
+    // Count matching words
+    const matches = queryWords.filter(word => 
+      contentWords.some(contentWord => contentWord.includes(word) || word.includes(contentWord))
+    ).length;
+    
+    // Boost score based on matches
+    const similarityBoost = Math.min(1, matches / queryWords.length);
+    score = Math.min(1, score + similarityBoost * 0.3);
+    
+    return score;
+  }
+
+  /**
+   * Retrieves and scores relevant memories for a given context
+   * @param context The context to search for relevant memories
+   * @param k The number of memories to retrieve
+   * @returns Array of scored memories
+   */
+  async getScoredMemories(context: string, k: number = 5): Promise<Array<{memory: Memory, score: number}>> {
+    if (!this.memoryManager) {
+      return [];
+    }
+    
+    try {
+      const memories = await this.memoryManager.retrieveMemories(context, k * 2); // Get more memories to score
+      
+      // Score each memory
+      const scoredMemories = await Promise.all(
+        memories.map(async (memory) => ({
+          memory,
+          score: await this.calculateRelevanceScore(context, memory)
+        }))
+      );
+      
+      // Sort by score and return top k
+      return scoredMemories
+        .sort((a, b) => b.score - a.score)
+        .slice(0, k);
+    } catch (error) {
+      console.error("Failed to retrieve and score memories:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Creates a memory-aware prompt by incorporating relevant memories
+   * @param basePrompt The base prompt
+   * @param context The context for retrieving relevant memories
+   * @param maxTokens Maximum number of tokens to include in the memory context
+   * @returns Memory-enhanced prompt
+   */
+  async createMemoryAwarePrompt(basePrompt: string, context: string, maxTokens: number = 1000): Promise<string> {
+    if (!this.memoryManager) {
+      return basePrompt;
+    }
+    
+    try {
+      // Get scored memories
+      const scoredMemories = await this.getScoredMemories(context, 10);
+      
+      // Filter out low-scoring memories
+      const relevantMemories = scoredMemories.filter(item => item.score > 0.3);
+      
+      if (relevantMemories.length === 0) {
+        return basePrompt;
+      }
+      
+      // Create memory context section
+      let memoryContext = "\n\n## Relevant Past Experiences:\n";
+      
+      // Implement context compression to stay within token limits
+      let currentTokens = 0;
+      for (const item of relevantMemories) {
+        const memoryText = `[${item.memory.type}] ${item.memory.content} (Relevance: ${(item.score * 100).toFixed(1)}%)`;
+        
+        // Rough estimate of tokens (4 characters per token is a rough approximation)
+        const estimatedTokens = memoryText.length / 4;
+        
+        if (currentTokens + estimatedTokens > maxTokens) {
+          break;
+        }
+        
+        memoryContext += `\n- ${memoryText}`;
+        currentTokens += estimatedTokens;
+      }
+      
+      // Append memory context to the base prompt
+      return `${basePrompt}${memoryContext}\n\nPlease consider these past experiences when making your decision.`;
+    } catch (error) {
+      console.error("Failed to create memory-aware prompt:", error);
+      return basePrompt;
+    }
   }
 
   /**

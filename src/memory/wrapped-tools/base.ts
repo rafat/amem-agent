@@ -2,17 +2,20 @@ import { StructuredTool } from "langchain/tools";
 import { MemoryManager } from "../manager";
 import { MemoryType } from "../models";
 import { z } from "zod";
+import { SeiAgentKit } from "../../agent";
 
 export abstract class MemoryAwareTool<
   T extends z.ZodObject<any, any, any, any>,
 > extends StructuredTool<T> {
   protected memoryManager: MemoryManager;
   protected userId: string;
+  protected seiKit: SeiAgentKit;
 
-  constructor(memoryManager: MemoryManager, userId: string) {
+  constructor(memoryManager: MemoryManager, userId: string, seiKit: SeiAgentKit) {
     super();
     this.memoryManager = memoryManager;
     this.userId = userId;
+    this.seiKit = seiKit;
   }
 
   /**
@@ -29,7 +32,7 @@ export abstract class MemoryAwareTool<
     metadata: Record<string, any> = {},
   ): Promise<void> {
     try {
-      // Determine memory type based on result and action
+      // Determine memory type based on result
       let memoryType: MemoryType = "transaction_record";
       if (result?.status === "error") {
         memoryType = "reflection";
@@ -224,6 +227,13 @@ export abstract class MemoryAwareTool<
     k: number = 3,
   ): Promise<any[]> {
     try {
+      // Use the agent's enhanced memory retrieval if available
+      if (this.seiKit.memoryManager) {
+        const scoredMemories = await this.seiKit.getScoredMemories(queryText, k);
+        return scoredMemories.map(item => item.memory);
+      }
+      
+      // Fallback to basic memory retrieval
       return await this.memoryManager.retrieveMemories(queryText, k);
     } catch (error) {
       console.error("Failed to retrieve relevant memories:", error);
@@ -245,9 +255,12 @@ export abstract class MemoryAwareTool<
       const result = await this._callRaw(input);
 
       // Record successful execution
-      await this.recordToolExecution(this.name, input, result, {
-        status: "success",
-      });
+      await this.recordToolExecution(
+        this.name,
+        input,
+        result,
+        { status: "success" },
+      );
 
       return JSON.stringify(result);
     } catch (error: any) {
@@ -258,9 +271,12 @@ export abstract class MemoryAwareTool<
         code: error.code || "UNKNOWN_ERROR",
       };
 
-      await this.recordToolExecution(this.name, input, errorResult, {
-        status: "error",
-      });
+      await this.recordToolExecution(
+        this.name,
+        input,
+        errorResult,
+        { status: "error" },
+      );
 
       return JSON.stringify(errorResult);
     }
