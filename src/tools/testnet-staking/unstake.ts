@@ -1,6 +1,9 @@
 import { SeiAgentKit } from "../../index";
 import { Address, encodeFunctionData } from "viem";
 import { sendTransaction } from "../../utils/transaction";
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * Unstakes tokens from the testnet staking contract
@@ -25,9 +28,11 @@ export async function unstakeTokens(
       args: [stakingToken, amount]
     });
 
-    // For now, we'll use a placeholder address for the staking contract
-    // This should be updated with the actual deployed contract address
-    const stakingContractAddress = "0x0000000000000000000000000000000000000000" as Address;
+    // Use the actual staking contract address from environment variables
+    const stakingContractAddress = process.env.STAKING_ADDRESS as Address;
+    if (!stakingContractAddress) {
+      throw new Error("STAKING_ADDRESS environment variable is not set");
+    }
 
     // Send the transaction
     const txHash = await sendTransaction({

@@ -1,6 +1,9 @@
 import { SeiAgentKit } from "../../agent";
 import { Address, encodeFunctionData, decodeFunctionResult } from "viem";
 import { sendTransaction } from "../../utils/transaction";
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * Gets the user's portfolio from the testnet contracts
@@ -23,9 +26,11 @@ export async function getTestnetPortfolio(
       args: [userAddress]
     });
 
-    // For now, we'll use a placeholder address for the portfolio tracker contract
-    // This should be updated with the actual deployed contract address
-    const portfolioContractAddress = "0x0000000000000000000000000000000000000000" as Address;
+    // Use the actual portfolio tracker contract address from environment variables
+    const portfolioContractAddress = process.env.PORTFOLIO_TRACKER_ADDRESS as Address;
+    if (!portfolioContractAddress) {
+      throw new Error("PORTFOLIO_TRACKER_ADDRESS environment variable is not set");
+    }
 
     // TODO: Implement the actual call to get the portfolio data
     // This would typically involve a read operation rather than a transaction

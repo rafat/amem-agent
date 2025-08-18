@@ -1,6 +1,9 @@
 import { SeiAgentKit } from "../../index";
 import { Address, encodeFunctionData } from "viem";
 import { sendTransaction } from "../../utils/transaction";
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * Repays borrowed tokens to the testnet lending pool
@@ -27,9 +30,11 @@ export async function repayBorrowedTokens(
       args: [collateralToken, borrowToken, amount]
     });
 
-    // For now, we'll use a placeholder address for the lending contract
-    // This should be updated with the actual deployed contract address
-    const lendingContractAddress = "0x0000000000000000000000000000000000000000" as Address;
+    // Use the actual lending contract address from environment variables
+    const lendingContractAddress = process.env.LENDING_POOL_ADDRESS as Address;
+    if (!lendingContractAddress) {
+      throw new Error("LENDING_POOL_ADDRESS environment variable is not set");
+    }
 
     // Send the transaction
     const txHash = await sendTransaction({

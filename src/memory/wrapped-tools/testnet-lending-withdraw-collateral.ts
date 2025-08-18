@@ -4,30 +4,26 @@ import { Address } from "viem";
 import { z } from "zod";
 import { MemoryManager } from "../manager";
 
-const TestnetLendingBorrowInputSchema = z.object({
+const TestnetLendingWithdrawCollateralInputSchema = z.object({
   collateralToken: z
     .string()
     .describe("The contract address of the collateral token"),
-  borrowToken: z
-    .string()
-    .describe("The contract address of the token to borrow"),
-  amount: z.string().describe("The amount of tokens to borrow (in wei)"),
+  amount: z.string().describe("The amount of collateral to withdraw (in wei)"),
 });
 
-export class MemoryAwareTestnetLendingBorrowTool extends MemoryAwareTool<
-  typeof TestnetLendingBorrowInputSchema
+export class MemoryAwareTestnetLendingWithdrawCollateralTool extends MemoryAwareTool<
+  typeof TestnetLendingWithdrawCollateralInputSchema
 > {
-  name = "memory_aware_testnet_lending_borrow";
-  description = `Borrow tokens from the testnet lending pool with memory recording.
+  name = "memory_aware_testnet_lending_withdraw_collateral";
+  description = `Withdraw collateral from the testnet lending pool with memory recording.
   
-  This tool allows you to borrow tokens from the testnet lending pool.
+  This tool allows you to withdraw collateral from the testnet lending pool.
   All actions are automatically recorded in the agent's memory for future reference.
   
   Parameters:
   - collateralToken: The contract address of the collateral token
-  - borrowToken: The contract address of the token to borrow
-  - amount: The amount of tokens to borrow (in wei)`;
-  schema = TestnetLendingBorrowInputSchema;
+  - amount: The amount of collateral to withdraw (in wei)`;
+  schema = TestnetLendingWithdrawCollateralInputSchema;
 
   private readonly seiKit: SeiAgentKit;
 
@@ -41,27 +37,29 @@ export class MemoryAwareTestnetLendingBorrowTool extends MemoryAwareTool<
   }
 
   protected async _callRaw(
-    input: z.infer<typeof TestnetLendingBorrowInputSchema>,
+    input: z.infer<typeof TestnetLendingWithdrawCollateralInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
-      `Lending borrow ${input.borrowToken}`,
+      `Lending withdraw collateral ${input.collateralToken}`,
       2,
     );
 
-    console.log("Relevant memories for borrowing:", relevantMemories);
+    console.log(
+      "Relevant memories for withdrawing collateral:",
+      relevantMemories,
+    );
 
-    // Execute the actual borrow
-    const txHash = await this.seiKit.borrowTokens(
+    // Execute the actual withdraw collateral
+    const txHash = await this.seiKit.withdrawCollateral(
       input.collateralToken as Address,
-      input.borrowToken as Address,
       BigInt(input.amount),
     );
 
     return {
       status: "success",
       transactionHash: txHash,
-      message: `Successfully borrowed tokens. Transaction hash: ${txHash}`,
+      message: `Successfully withdrew collateral. Transaction hash: ${txHash}`,
     };
   }
 
@@ -78,7 +76,6 @@ export class MemoryAwareTestnetLendingBorrowTool extends MemoryAwareTool<
     const lendingMetadata = {
       ...metadata,
       collateralToken: parameters.collateralToken,
-      borrowToken: parameters.borrowToken,
       amount: parameters.amount,
     };
 

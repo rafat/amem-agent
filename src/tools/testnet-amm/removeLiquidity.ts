@@ -1,6 +1,9 @@
 import { SeiAgentKit } from "../../index";
 import { Address, encodeFunctionData } from "viem";
 import { sendTransaction } from "../../utils/transaction";
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * Removes liquidity from the testnet AMM
@@ -27,9 +30,11 @@ export async function removeLiquidity(
       args: [tokenA, tokenB, liquidity]
     });
 
-    // For now, we'll use a placeholder address for the AMM contract
-    // This should be updated with the actual deployed contract address
-    const ammContractAddress = "0x0000000000000000000000000000000000000000" as Address;
+    // Use the actual AMM contract address from environment variables
+    const ammContractAddress = process.env.AMM_ADDRESS as Address;
+    if (!ammContractAddress) {
+      throw new Error("AMM_ADDRESS environment variable is not set");
+    }
 
     // Send the transaction
     const txHash = await sendTransaction({

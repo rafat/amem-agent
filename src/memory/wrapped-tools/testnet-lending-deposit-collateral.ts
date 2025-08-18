@@ -1,15 +1,19 @@
 import { MemoryAwareTool } from "./base";
 import { SeiAgentKit } from "../../agent";
-import { Address } from 'viem';
+import { Address } from "viem";
 import { z } from "zod";
 import { MemoryManager } from "../manager";
 
 const TestnetLendingDepositCollateralInputSchema = z.object({
-  collateralToken: z.string().describe("The contract address of the collateral token"),
+  collateralToken: z
+    .string()
+    .describe("The contract address of the collateral token"),
   amount: z.string().describe("The amount of collateral to deposit (in wei)"),
 });
 
-export class MemoryAwareTestnetLendingDepositCollateralTool extends MemoryAwareTool<typeof TestnetLendingDepositCollateralInputSchema> {
+export class MemoryAwareTestnetLendingDepositCollateralTool extends MemoryAwareTool<
+  typeof TestnetLendingDepositCollateralInputSchema
+> {
   name = "memory_aware_testnet_lending_deposit_collateral";
   description = `Deposit collateral in the testnet lending pool with memory recording.
   
@@ -23,32 +27,64 @@ export class MemoryAwareTestnetLendingDepositCollateralTool extends MemoryAwareT
 
   private readonly seiKit: SeiAgentKit;
 
-  constructor(seiKit: SeiAgentKit, memoryManager: MemoryManager, userId: string) {
+  constructor(
+    seiKit: SeiAgentKit,
+    memoryManager: MemoryManager,
+    userId: string,
+  ) {
     super(memoryManager, userId);
     this.seiKit = seiKit;
   }
 
-  protected async _callRaw(input: z.infer<typeof TestnetLendingDepositCollateralInputSchema>): Promise<any> {
-    try {
-      // Get relevant memories for context
-      const relevantMemories = await this.getRelevantMemories(
-        `Lending deposit collateral ${input.collateralToken}`, 
-        2
-      );
-      
-      console.log("Relevant memories for depositing collateral:", relevantMemories);
+  protected async _callRaw(
+    input: z.infer<typeof TestnetLendingDepositCollateralInputSchema>,
+  ): Promise<any> {
+    // Get relevant memories for context
+    const relevantMemories = await this.getRelevantMemories(
+      `Lending deposit collateral ${input.collateralToken}`,
+      2,
+    );
 
-      // TODO: Implement the actual deposit collateral functionality
-      // For now, we'll simulate a successful transaction
-      const txHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
-      
-      return {
-        status: "success",
-        transactionHash: txHash,
-        message: `Successfully deposited collateral. Transaction hash: ${txHash}`,
-      };
-    } catch (error: any) {
-      throw error;
-    }
+    console.log(
+      "Relevant memories for depositing collateral:",
+      relevantMemories,
+    );
+
+    // Execute the actual deposit collateral
+    const txHash = await this.seiKit.depositCollateral(
+      input.collateralToken as Address,
+      BigInt(input.amount),
+    );
+
+    return {
+      status: "success",
+      transactionHash: txHash,
+      message: `Successfully deposited collateral. Transaction hash: ${txHash}`,
+    };
+  }
+
+  /**
+   * Override the recordToolExecution method to add lending-specific metadata
+   */
+  protected async recordToolExecution(
+    action: string,
+    parameters: Record<string, any>,
+    result: any,
+    metadata: Record<string, any> = {},
+  ): Promise<void> {
+    // Add lending-specific metadata
+    const lendingMetadata = {
+      ...metadata,
+      collateralToken: parameters.collateralToken,
+      amount: parameters.amount,
+    };
+
+    // Call the parent method with enhanced metadata
+    await super.recordToolExecution(
+      action,
+      parameters,
+      result,
+      lendingMetadata,
+    );
   }
 }
