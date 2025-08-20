@@ -35,19 +35,16 @@ export class MemoryAwareTestnetAMMRemoveLiquidityTool extends MemoryAwareTool<
   - amountBMin: The minimum amount of token B to receive (in wei)`;
   schema = TestnetAMMRemoveLiquidityInputSchema;
 
-  private readonly seiKit: SeiAgentKit;
-
   constructor(
     seiKit: SeiAgentKit,
     memoryManager: MemoryManager,
     userId: string,
   ) {
-    super(memoryManager, userId);
-    this.seiKit = seiKit;
+    super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(
-    input: z.infer<typeof TestnetAMMRemoveLiquidityInputSchema>,
+  protected override async _callRaw(
+    input: z.input<typeof TestnetAMMRemoveLiquidityInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
@@ -72,9 +69,9 @@ export class MemoryAwareTestnetAMMRemoveLiquidityTool extends MemoryAwareTool<
   }
 
   /**
-   * Override the recordToolExecution method to add liquidity-specific metadata
+   * Override the recordToolExecution method to add AMM-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

@@ -25,19 +25,16 @@ export class MemoryAwareTestnetStakingUnstakeTool extends MemoryAwareTool<
   - amount: The amount of tokens to unstake (in wei)`;
   schema = TestnetStakingUnstakeInputSchema;
 
-  private readonly seiKit: SeiAgentKit;
-
   constructor(
     seiKit: SeiAgentKit,
     memoryManager: MemoryManager,
     userId: string,
   ) {
-    super(memoryManager, userId);
-    this.seiKit = seiKit;
+    super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(
-    input: z.infer<typeof TestnetStakingUnstakeInputSchema>,
+  protected override async _callRaw(
+    input: z.input<typeof TestnetStakingUnstakeInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
@@ -63,7 +60,7 @@ export class MemoryAwareTestnetStakingUnstakeTool extends MemoryAwareTool<
   /**
    * Override the recordToolExecution method to add staking-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

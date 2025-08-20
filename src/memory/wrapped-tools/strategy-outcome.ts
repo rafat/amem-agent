@@ -30,19 +30,16 @@ export class MemoryAwareStrategyOutcomeTool extends MemoryAwareTool<
   - profitability: The profitability of the strategy on a scale from -1 (completely unprofitable) to 1 (highly profitable)`;
   schema = StrategyOutcomeInputSchema;
 
-  private readonly seiKit: SeiAgentKit;
-
   constructor(
     seiKit: SeiAgentKit,
     memoryManager: MemoryManager,
     userId: string,
   ) {
-    super(memoryManager, userId);
-    this.seiKit = seiKit;
+    super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(
-    input: z.infer<typeof StrategyOutcomeInputSchema>,
+  protected override async _callRaw(
+    input: z.input<typeof StrategyOutcomeInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
@@ -60,9 +57,9 @@ export class MemoryAwareStrategyOutcomeTool extends MemoryAwareTool<
   }
 
   /**
-   * Override the recordToolExecution method to properly record strategy outcomes
+   * Override the recordToolExecution method to add strategy outcome-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

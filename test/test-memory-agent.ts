@@ -1,4 +1,5 @@
 import { SeiAgentKit } from "../src/agent";
+import { createSeiTools } from "../src/langchain";
 import { MemoryManager } from "../src/memory/manager";
 import { 
   MemoryAwareTestnetAMMSwapTool,

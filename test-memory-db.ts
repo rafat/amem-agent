@@ -13,12 +13,12 @@ async function testMemorySystem() {
     
     // Add a test memory
     const memoryId = await memoryManager.addMemory({
-      content: 'Successfully swapped 100 USDC for 0.1 ETH on Symphony.',
+      content: 'Successfully swapped 100 USDC for 0.1 ETH on Testnet AMM.',
       type: 'transaction_record' as MemoryType,
       importance: 0.8,
       metadata: {
         userId: 'test_user_123',
-        protocol: 'Symphony',
+        protocol: 'Testnet AMM',
         fromToken: 'USDC',
         toToken: 'ETH',
         hash: '0x123456789abcdef',

@@ -25,19 +25,16 @@ export class MemoryAwareTestnetLendingDepositCollateralTool extends MemoryAwareT
   - amount: The amount of collateral to deposit (in wei)`;
   schema = TestnetLendingDepositCollateralInputSchema;
 
-  private readonly seiKit: SeiAgentKit;
-
   constructor(
     seiKit: SeiAgentKit,
     memoryManager: MemoryManager,
     userId: string,
   ) {
-    super(memoryManager, userId);
-    this.seiKit = seiKit;
+    super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(
-    input: z.infer<typeof TestnetLendingDepositCollateralInputSchema>,
+  protected override async _callRaw(
+    input: z.input<typeof TestnetLendingDepositCollateralInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
@@ -66,7 +63,7 @@ export class MemoryAwareTestnetLendingDepositCollateralTool extends MemoryAwareT
   /**
    * Override the recordToolExecution method to add lending-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

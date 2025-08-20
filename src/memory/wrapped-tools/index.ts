@@ -12,3 +12,6 @@ export * from "./testnet-staking-claim-rewards";
 export * from "./testnet-portfolio-get";
 export * from "./strategy-outcome";
 export * from "./market-observation";
+export * from "./sei-erc20-balance";
+export * from "./sei-erc20-transfer";
+export * from "./sei-erc20-approve";

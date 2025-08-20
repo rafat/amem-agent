@@ -237,6 +237,15 @@ export class SeiAgentKit {
   }
 
   /**
+   * Gets the ERC20 token balance
+   * @param tokenAddress Optional token contract address (if not provided, gets native SEI balance)
+   * @returns Promise with balance as string
+   */
+  async getERC20Balance(tokenAddress?: Address): Promise<string> {
+    return get_erc20_balance(this, tokenAddress);
+  }
+
+  /**
    * Transfers an ERC721 token
    * @param amount Deprecated parameter (kept for compatibility)
    * @param recipient The recipient address

@@ -28,19 +28,16 @@ export class MemoryAwareMarketObservationTool extends MemoryAwareTool<
   - trend: The current price trend of the token (up, down, or stable)`;
   schema = MarketObservationInputSchema;
 
-  private readonly seiKit: SeiAgentKit;
-
   constructor(
     seiKit: SeiAgentKit,
     memoryManager: MemoryManager,
     userId: string,
   ) {
-    super(memoryManager, userId);
-    this.seiKit = seiKit;
+    super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(
-    input: z.infer<typeof MarketObservationInputSchema>,
+  protected override async _callRaw(
+    input: z.input<typeof MarketObservationInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
@@ -58,9 +55,9 @@ export class MemoryAwareMarketObservationTool extends MemoryAwareTool<
   }
 
   /**
-   * Override the recordToolExecution method to properly record market observations
+   * Override the recordToolExecution method to add market observation-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

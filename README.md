@@ -24,22 +24,21 @@ This toolkit bridges the gap between AI and blockchain interaction, enabling the
 ## ✨ Features
 
 - **Token Operations**: Complete SEI ERC-20 and ERC-721 token management
-- **DeFi Protocol Integration**: Seamless interaction with SEI's DeFi ecosystem
-- **Swap Functionality**: Token swapping through Symphony aggregator
-- **Lending & Borrowing**: Interact with Takara protocol for lending operations
-- **Staking Operations**: Stake and unstake SEI tokens with Silo
-- **Perpetual Trading**: Trade perpetual contracts on Citrex protocol
+- **DeFi Protocol Integration**: Seamless interaction with SEI's Testnet DeFi protocols
+- **Swap Functionality**: Token swapping on Testnet AMM
+- **Lending & Borrowing**: Interact with Testnet Lending protocol
+- **Staking Operations**: Stake and unstake SEI tokens on Testnet Staking protocol
+- **Portfolio Management**: Retrieve portfolio information from testnet contracts
 - **LangChain Integration**: Build AI agents with LangChain and LangGraph
 
 ## 📋 Supported Protocols
 
-The Cambrian Agent Kit integrates with a variety of protocols and services:
+The Cambrian Agent Kit integrates with testnet protocols and services:
 
 ### DeFi Protocols
-- **Symphony**: Token swapping and routing
-- **Takara**: Lending and borrowing platform
-- **Silo**: Staking and yield farming
-- **Citrex**: Perpetual trading platform
+- **Testnet AMM**: Token swapping and liquidity provision
+- **Testnet Lending**: Collateral deposit, borrowing, repayment, and withdrawal
+- **Testnet Staking**: Token staking, unstaking, and reward claiming
 
 ### Token Standards
 - **SEI ERC-20**: Complete token operations

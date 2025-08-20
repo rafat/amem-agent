@@ -7,7 +7,7 @@ This document explains how to use the A-MEM system that has been integrated into
 The A-MEM system consists of three main components:
 
 1. **Memory Manager**: The core component that handles storing and retrieving memories
-2. **Database Connectors**: Interfaces to Neo4j (graph database), ChromaDB (vector database), and Supabase (relational database)
+2. **Database Connectors**: Interfaces to Neo4j (graph database) and ChromaDB (vector database)
 3. **Intelligence Engine**: A background service that runs scheduled tasks to reflect on memories and generate insights
 
 ## Setting Up the System

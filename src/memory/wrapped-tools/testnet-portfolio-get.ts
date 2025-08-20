@@ -15,19 +15,16 @@ export class MemoryAwareTestnetPortfolioGetTool extends MemoryAwareTool<
   All actions are automatically recorded in the agent's memory for future reference.`;
   schema = TestnetPortfolioGetInputSchema;
 
-  private readonly seiKit: SeiAgentKit;
-
   constructor(
     seiKit: SeiAgentKit,
     memoryManager: MemoryManager,
     userId: string,
   ) {
-    super(memoryManager, userId);
-    this.seiKit = seiKit;
+    super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(
-    _input: z.infer<typeof TestnetPortfolioGetInputSchema>,
+  protected override async _callRaw(
+    _input: z.input<typeof TestnetPortfolioGetInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
@@ -50,7 +47,7 @@ export class MemoryAwareTestnetPortfolioGetTool extends MemoryAwareTool<
   /**
    * Override the recordToolExecution method to add portfolio-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

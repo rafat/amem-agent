@@ -29,7 +29,7 @@ function checkRequiredEnvVars(): void {
   }
 }
 
-async function setupAgent() {
+async function setupAgent(): Promise<{ agent: any, config: any }> {
   try {
     
     const llm = new ChatOpenAI({

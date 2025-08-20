@@ -12,7 +12,7 @@ fi
 echo "✓ Docker is running"
 
 # Check if services are running
-SERVICES=("chromadb" "neo4j" "supabase_db" "agent-kit")
+SERVICES=("chromadb" "neo4j" "agent-kit")
 
 for service in "${SERVICES[@]}"; do
   if docker-compose ps | grep -q "$service.*Up"; then

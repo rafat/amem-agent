@@ -23,19 +23,16 @@ export class MemoryAwareTestnetStakingClaimRewardsTool extends MemoryAwareTool<
   - stakingToken: The contract address of the staking token`;
   schema = TestnetStakingClaimRewardsInputSchema;
 
-  private readonly seiKit: SeiAgentKit;
-
   constructor(
     seiKit: SeiAgentKit,
     memoryManager: MemoryManager,
     userId: string,
   ) {
-    super(memoryManager, userId);
-    this.seiKit = seiKit;
+    super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(
-    input: z.infer<typeof TestnetStakingClaimRewardsInputSchema>,
+  protected override async _callRaw(
+    input: z.input<typeof TestnetStakingClaimRewardsInputSchema>,
   ): Promise<any> {
     // Get relevant memories for context
     const relevantMemories = await this.getRelevantMemories(
@@ -60,7 +57,7 @@ export class MemoryAwareTestnetStakingClaimRewardsTool extends MemoryAwareTool<
   /**
    * Override the recordToolExecution method to add staking-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

@@ -1,1 +1,25 @@
-module.exports = {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  roots: ['<rootDir>/test'],\n  testMatch: [\n    '**/__tests__/**/*.+(ts|tsx|js)',\n    '**/?(*.)+(spec|test).+(ts|tsx|js)'\n  ],\n  transform: {\n    '^.+\\.(ts|tsx)$': 'ts-jest'\n  },\n  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],\n  collectCoverageFrom: [\n    'src/**/*.{ts,tsx}',\n    '!src/**/*.d.ts'\n  ],\n  coverageDirectory: 'coverage',\n  coverageReporters: ['text', 'lcov', 'html'],\n  verbose: true,\n  testTimeout: 30000\n};
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/test'],
+  testMatch: [
+    '**/__tests__/**/*.+(ts|tsx|js)',
+    '**/?(*.)+(spec|test).+(ts|tsx|js)'
+  ],
+  transform: {
+    '^.+\\.(ts|tsx)': 'ts-jest'
+  },
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts'
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  verbose: true,
+  testTimeout: 30000,
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/'
+  ]
+};

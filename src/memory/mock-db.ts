@@ -69,11 +69,3 @@ export function getNeo4jDriver(): any {
   return new MockNeo4jDriver();
 }
 
-// Mock Supabase Client
-class MockSupabaseClient {
-  // No-op for now
-}
-
-export function getSupabaseClient(): any {
-  return new MockSupabaseClient();
-}

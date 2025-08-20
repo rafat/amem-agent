@@ -27,7 +27,7 @@ export class MemoryAwareTestnetAMMSwapTool extends MemoryAwareTool<typeof Testne
     super(memoryManager, userId, seiKit);
   }
 
-  protected async _callRaw(input: z.infer<typeof TestnetAMMSwapInputSchema>): Promise<any> {
+  protected override async _callRaw(input: z.input<typeof TestnetAMMSwapInputSchema>): Promise<any> {
     try {
       // Get relevant memories for context
       const relevantMemories = await this.getRelevantMemories(
@@ -57,7 +57,7 @@ export class MemoryAwareTestnetAMMSwapTool extends MemoryAwareTool<typeof Testne
   /**
    * Override the recordToolExecution method to add swap-specific metadata
    */
-  protected async recordToolExecution(
+  protected override async recordToolExecution(
     action: string,
     parameters: Record<string, any>,
     result: any,

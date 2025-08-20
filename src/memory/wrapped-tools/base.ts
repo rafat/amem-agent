@@ -1,11 +1,13 @@
 import { StructuredTool } from "langchain/tools";
+import { type ToolInputSchemaBase } from "@langchain/core/tools";
 import { MemoryManager } from "../manager";
 import { MemoryType } from "../models";
 import { z } from "zod";
 import { SeiAgentKit } from "../../agent";
+import { CallbackManagerForToolRun } from "@langchain/core/callbacks/manager";
 
 export abstract class MemoryAwareTool<
-  T extends z.ZodObject<any, any, any, any>,
+  T extends ToolInputSchemaBase,
 > extends StructuredTool<T> {
   protected memoryManager: MemoryManager;
   protected userId: string;
@@ -250,7 +252,10 @@ export abstract class MemoryAwareTool<
   /**
    * Wrapper around _callRaw that adds memory recording
    */
-  protected async _call(input: z.infer<T>): Promise<string> {
+  protected async _call(
+    input: z.input<T>,
+    runManager?: CallbackManagerForToolRun
+  ): Promise<string> {
     try {
       const result = await this._callRaw(input);
 

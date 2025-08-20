@@ -1,12 +1,11 @@
 import { StructuredTool } from "langchain/tools";
 import { SeiAgentKit } from "../../agent";
 import { Address } from 'viem';
-import { getTokenAddressFromTicker } from "../../tools";
 import { z } from "zod";
 
 const SeiERC20BalanceInputSchema = z.object({
-  contract_address: z.string().optional(),
-  ticker: z.string().optional(),
+  contract_address: z.string().optional().describe("The contract address of the token"),
+  ticker: z.string().optional().describe("The token symbol/ticker (e.g., \"USDC\")"),
 });
 
 export class SeiERC20BalanceTool extends StructuredTool<typeof SeiERC20BalanceInputSchema> {
@@ -30,29 +29,35 @@ export class SeiERC20BalanceTool extends StructuredTool<typeof SeiERC20BalanceIn
 
   protected async _call(input: z.infer<typeof SeiERC20BalanceInputSchema>): Promise<string> {
     try {
-      var balance;
+      let balance;
       if (input) {
         let contract_address;
         if (input.ticker) {
-          contract_address = await getTokenAddressFromTicker(input.ticker);
+          contract_address = await this.seiKit.getTokenAddressFromTicker(input.ticker);
         }
-        else if (input.contract_address) { contract_address = input.contract_address; }
-        balance = await this.seiKit.getERC20Balance(contract_address as Address);
+        else if (input.contract_address) { 
+          contract_address = input.contract_address as Address; 
+        }
+        balance = await this.seiKit.getERC20Balance(contract_address);
       } else {
         balance = await this.seiKit.getERC20Balance();
       }
 
-      return JSON.stringify({
+      const result = {
         status: "success",
         balance,
-        token: input || "SEI",
-      });
+        token: input.ticker || input.contract_address || "SEI",
+      };
+
+      return JSON.stringify(result);
     } catch (error: any) {
-      return JSON.stringify({
+      const errorResult = {
         status: "error",
         message: error.message,
         code: error.code || "UNKNOWN_ERROR",
-      });
+      };
+
+      return JSON.stringify(errorResult);
     }
   }
 }

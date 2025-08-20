@@ -30,7 +30,7 @@
     "moduleResolution": "node",
     "types": ["jest"],
     "allowImportingTsExtensions": true,
-    "noEmit": false
+    "noEmit": true
   },
   "include": [
     "src/**/*",
